@@ -1,7 +1,3 @@
-from product import Product
-from database import Database
-import json
-
 
 class Store:
     def __init__(self, Database_class, d_file_name, b_file_name):
@@ -10,9 +6,9 @@ class Store:
         self.balance = self.database.bank_loader()
 
     def enter_investment(self, investment: int):
-        self.database.bank_balance = {'balance':investment,'profit':0}
+        self.database.bank_balance = {'balance': investment, 'profit': 0}
         self.database.save_to_bank()
-        self.balance = self.database.bank_balance
+        self.balance = self.database.bank_loader()
         print('The investment is made...')
 
     def enter_product(self, product):
@@ -23,22 +19,23 @@ class Store:
                 self.available_products[product.name] = {'quantity': self.available_products[product.name]['quantity'],
                                                          'purchase_price': product.purchase_price,
                                                          'payment_price': product.payment_price}
-                # self.balance-=product.purchase_price*product.quantity
+                self.balance['balance'] -= product.purchase_price * product.quantity
+                self.database.save_to_bank()
                 self.database.save_prod()
                 print(f'Prices of {product.name} is changed in stock')
             else:
-                # self.balance-=product.purchase_price*product.quantity
+                self.balance['balance'] -= product.purchase_price * product.quantity
+                self.database.save_to_bank()
                 self.database.save_prod()
                 print(f'Quantity of {product.name} is changed in stock::  '
                       f'Quantity -- <{self.available_products[product.name]["quantity"]}>')
 
         else:
             self.available_products[product.name] = {'quantity': product.quantity,
-                                                              'purchase_price': product.purchase_price,
-                                                              'payment_price': product.payment_price}
-            print(self.database.products)             ##########
-            print(self.available_products)             ##########
-            # self.balance -= product.purchase_price * product.quantity
+                                                     'purchase_price': product.purchase_price,
+                                                     'payment_price': product.payment_price}
+            self.balance['balance'] -= product.purchase_price * product.quantity
+            self.database.save_to_bank()
             self.database.save_prod()
             print(f'{product.name} is saved in stock::')
 
@@ -51,6 +48,10 @@ class Store:
             if name_p in self.available_products:
                 if self.available_products[name_p]['quantity'] >= quantity_p:
                     self.available_products[name_p]['quantity'] -= quantity_p
+                    self.balance['balance'] += quantity_p * self.available_products[name_p]['payment_price']
+                    self.balance['profit'] += (self.available_products[name_p]['payment_price'] - \
+                                               self.available_products[name_p]['purchase_price']) * quantity_p
+                    self.database.save_to_bank()
                     if self.available_products[name_p]['quantity'] == 0:
                         self.check_prod(name_p)
                         print('The product is sold::')
@@ -68,31 +69,3 @@ class Store:
     def stock_balance(self):
         for prod in self.available_products:
             print(f'{prod}--{self.available_products[prod]["quantity"]}')
-
-
-
-### Tests
-#
-# if __name__ == '__main__':
-#     s = Store(Database, 'data.json', 'bank.json')
-#     s.balance = s.database.bank_loader()
-#     print(id(s.balance))
-#     print(id(s.database.bank_balance))
-#
-#
-#     print('_________________')
-#     s.available_products = s.database.loader()
-#     print(id(s.available_products))
-#     print(id(s.database.products))
-#
-#     # s.enter_product(Product('qqqqqqqq', 123, 45, 77))
-#     # s.enter_product(Product('wwwwwwwww', 123, 45, 77))
-#     #
-#     # s.enter_product(Product('asd',6,23,23))
-#     # while True:
-#     #     c = input("--->")
-#     #     if c == '1':
-#     #         s.enter_product(Product('apple',10,200,300))
-#     #     if c == '2':
-#     #         s.enter_product(Product('tanc', 20, 50,100))
-#     #     # print(s.balance)
