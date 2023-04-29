@@ -7,6 +7,7 @@ class Store:
     def __init__(self, Database_class, d_file_name):
         self.database = Database_class(d_file_name)
         self.available_products = self.database.loader()
+        self.balance = 100000
 
     def enter_product(self, product):
         if product.name in self.available_products:
@@ -16,10 +17,14 @@ class Store:
                 self.available_products[product.name] = {'quantity': self.available_products[product.name]['quantity'],
                                                          'purchase_price': product.purchase_price,
                                                          'payment_price': product.payment_price}
+                self.balance-=product.purchase_price*product.quantity
                 self.database.save_prod()
+                print(f'Balance is {self.balance}')
                 print(f'Prices of {product.name} is changed in stock')
             else:
+                self.balance-=product.purchase_price*product.quantity
                 self.database.save_prod()
+                print(f'Balance is {self.balance}')
                 print(f'Quantity of {product.name} is changed in stock::  '
                       f'Quantity -- <{self.available_products[product.name]["quantity"]}>')
 
@@ -27,7 +32,9 @@ class Store:
             self.database.available_products[product.name] = {'quantity': product.quantity,
                                                               'purchase_price': product.purchase_price,
                                                               'payment_price': product.payment_price}
+            self.balance -= product.purchase_price * product.quantity
             self.database.save_prod()
+            print(f'Balance is {self.balance}')
             print(f'{product.name} is saved in stock::')
 
     def check_prod(self, name_p):
@@ -41,11 +48,11 @@ class Store:
                     self.available_products[name_p]['quantity'] -= quantity_p
                     if self.available_products[name_p]['quantity'] == 0:
                         self.check_prod(name_p)
-                        print('the product is sold')
+                        print('The product is sold::')
 
                     else:
                         self.database.save_prod()
-                        print('the product is sold')
+                        print('The product is sold::')
                 else:
                     print('Not enough quantity...')
             else:
@@ -64,5 +71,10 @@ if __name__ == '__main__':
     # s.enter_product(Product('wwwwwwwww', 123, 45, 77))
     #
     # s.enter_product(Product('asd',6,23,23))
-    s.stock_balance()
-    # print(s.available_products)
+    while True:
+        c = input("--->")
+        if c == '1':
+            s.enter_product(Product('apple',10,200,300))
+        if c == '2':
+            s.enter_product(Product('tanc', 20, 50,100))
+        print(s.balance)

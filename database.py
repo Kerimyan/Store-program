@@ -14,3 +14,4 @@ class Database:
     def save_prod(self):
         with open(self.filename, 'w') as f:
             json.dump(self.available_products, f)
+
