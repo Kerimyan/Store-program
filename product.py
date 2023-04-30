@@ -23,8 +23,3 @@ class Product:
             raise ValueError
 
 
-
-if __name__ == '__main__':
-    p = Product(87, 'davo', 'arshak', 56)
-
-    print(p.quantity)
