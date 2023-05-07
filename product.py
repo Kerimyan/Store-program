@@ -4,22 +4,10 @@ class Product:
         type(quantity) == int and \
         type(purchase_price) == int and\
         type(payment_price) == int:
-            self._name = name
+            self.name = name
             self.quantity = quantity
             self.purchase_price = purchase_price
             self.payment_price = payment_price
         else:
             raise ValueError
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, value):
-        if isinstance(value, str):
-            self._name = value
-        else:
-            raise ValueError
-
 
